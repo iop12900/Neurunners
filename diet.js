@@ -1,1 +1,1 @@
-const meal = 6;
+const meal = 20;

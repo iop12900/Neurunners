@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mind Orbit | Every idea has an orbit.</title>
+  <meta name="description" content="생각정리 중관여 사용자를 위한 모바일 중심 AI 마인드맵, Mind Orbit. 메모앱보다 더 구조적이고, 무거운 툴보다 더 가볍게 생각을 정리하세요." />
+  <style>
+    :root {
+      --bg-1: #070b2a;
+      --bg-2: #140f46;
+      --bg-3: #28146f;
+      --bg-4: #4a1fb0;
+      --pink: #ff49cf;
+      --violet: #9a5cff;
+      --sky: #63d4ff;
+      --white: #f8f9ff;
+      --text: #eef1ff;
+      --muted: #c8c9eb;
+      --line: rgba(255,255,255,0.12);
+      --glass: rgba(255,255,255,0.08);
+      --glass-2: rgba(255,255,255,0.14);
+      --shadow: 0 20px 60px rgba(7, 11, 42, 0.42);
+      --max: 1180px;
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,73,207,0.14), transparent 18%),
+        radial-gradient(circle at 85% 15%, rgba(99,212,255,0.12), transparent 18%),
+        radial-gradient(circle at center, #34178a 0%, #1a115a 34%, #0c1039 68%, #060825 100%);
+      line-height: 1.65;
+      letter-spacing: -0.01em;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.8) 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 15%, rgba(255,255,255,0.6) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.75) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 10%, rgba(255,255,255,0.5) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 15% 70%, rgba(99,212,255,0.8) 0 2px, transparent 3px),
+        radial-gradient(circle at 90% 60%, rgba(255,73,207,0.7) 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.45) 0 1.5px, transparent 3px);
+      opacity: 0.9;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { font: inherit; }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -48px;
+      z-index: 999;
+      background: #11152f;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .skip-link:focus { top: 12px; }
+
+    .container {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(7, 11, 42, 0.34);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .nav-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(154,92,255,0.75));
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.16), 0 12px 30px rgba(154,92,255,0.35);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      border: 2px solid rgba(7,11,42,0.22);
+    }
+
+    .brand-mark::before {
+      inset: 8px;
+    }
+
+    .brand-mark::after {
+      inset: 14px;
+      background: rgba(7,11,42,0.15);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--white);
+    }
+
+    .menu-btn {
+      display: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 84px 0 70px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(6px);
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 220px;
+      height: 220px;
+      left: -60px;
+      top: 120px;
+      background: radial-gradient(circle at 30% 30%, #ffd2a4 0%, #ff8fd7 38%, #9c55ff 75%, rgba(255,255,255,0.12) 100%);
+      box-shadow: 0 0 40px rgba(255,73,207,0.26);
+    }
+
+    .hero::after {
+      width: 280px;
+      height: 280px;
+      right: -80px;
+      top: 170px;
+      background: radial-gradient(circle at 35% 35%, #ffa0d6 0%, #ba69ff 45%, #4b2cff 82%, rgba(255,255,255,0.1) 100%);
+      box-shadow: 0 0 50px rgba(154,92,255,0.28);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.04fr 0.96fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      color: #dce2ff;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      letter-spacing: -0.04em;
+    }
+
+    h1 {
+      font-size: clamp(44px, 6.6vw, 78px);
+      line-height: 1.02;
+      margin-bottom: 18px;
+      max-width: 10.5ch;
+    }
+
+    .gradient-title {
+      background: linear-gradient(180deg, #ff74da 0%, #cf43ff 42%, #8c5bff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-copy {
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+      max-width: 58ch;
+      margin: 0;
+    }
+
+    .hero-copy strong { color: var(--white); }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .btn {
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff4bd2 0%, #8a5cff 100%);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 14px 36px rgba(255,75,210,0.24);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .tag {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #d7ddff;
+      font-size: 14px;
+    }
+
+    .hero-panel {
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      right: -24px;
+      top: -24px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,194,101,0.9), rgba(255,75,210,0.7), rgba(138,92,255,0.28));
+      opacity: 0.9;
+      filter: blur(3px);
+    }
+
+    .panel-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-dots { display: flex; gap: 8px; }
+    .panel-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .panel-label {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #d7ddff;
+      font-size: 13px;
+    }
+
+    .app-preview {
+      min-height: 520px;
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at center, rgba(138,92,255,0.22), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 24px;
+    }
+
+    .space-planet {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.92;
+      filter: blur(0.2px);
+    }
+
+    .planet-a {
+      width: 96px;
+      height: 96px;
+      left: -18px;
+      top: 26px;
+      background: radial-gradient(circle at 35% 35%, #ffe7b8 0%, #ff8fd6 45%, #7d47ff 88%);
+      box-shadow: 0 0 34px rgba(255,75,210,0.18);
+    }
+
+    .planet-b {
+      width: 70px;
+      height: 70px;
+      right: 18px;
+      top: 36px;
+      background: radial-gradient(circle at 35% 35%, #ffd2a2 0%, #ff77d5 40%, #8b5cff 82%);
+      box-shadow: 0 0 24px rgba(138,92,255,0.2);
+    }
+
+    .planet-c {
+      width: 72px;
+      height: 72px;
+      left: 40px;
+      bottom: 48px;
+      background: radial-gradient(circle at 35% 35%, #ffc69f 0%, #ff6dbc 36%, #5126ca 82%);
+      box-shadow: 0 0 28px rgba(255,75,210,0.16);
+    }
+
+    .planet-ring::after {
+      content: "";
+      position: absolute;
+      inset: 28%;
+      border: 6px solid rgba(255,183,72,0.88);
+      border-radius: 50%;
+      transform: rotate(-18deg) scaleX(1.7) scaleY(0.5);
+    }
+
+    .mindmap-wrap {
+      position: absolute;
+      left: 24px;
+      right: 40%;
+      top: 24px;
+      bottom: 24px;
+      border-radius: 24px;
+      background: rgba(12,16,57,0.56);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+      overflow: hidden;
+      padding: 18px;
+    }
+
+    .map-grid {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(154,92,255,0.12), transparent 35%),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: auto, 24px 24px, 24px 24px;
+    }
+
+    .connector {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(99,212,255,0.72), rgba(255,255,255,0.06));
+      transform-origin: left center;
+    }
+
+    .c1 { width: 150px; left: 22%; top: 30%; transform: rotate(28deg); }
+    .c2 { width: 150px; right: 21%; top: 30%; transform: rotate(152deg); }
+    .c3 { width: 146px; left: 22%; bottom: 30%; transform: rotate(-28deg); }
+    .c4 { width: 146px; right: 21%; bottom: 30%; transform: rotate(208deg); }
+    .c5 { width: 110px; left: 50%; top: 19%; transform: translateX(-50%) rotate(90deg); }
+
+    .map-node {
+      position: absolute;
+      padding: 13px 15px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 28px rgba(7,11,42,0.18);
+      font-size: 14px;
+    }
+
+    .map-node strong { display: block; margin-bottom: 4px; }
+
+    .map-main { left: 48%; top: 47%; transform: translate(-50%, -50%); min-width: 220px; }
+    .map-a { left: 6%; top: 14%; }
+    .map-b { right: 4%; top: 16%; }
+    .map-c { left: 8%; bottom: 16%; }
+    .map-d { right: 6%; bottom: 18%; }
+    .map-e { left: 44%; top: 7%; }
+
+    .preview-phone {
+      position: absolute;
+      right: 24px;
+      top: 70px;
+      width: 38%;
+      min-width: 220px;
+      border-radius: 30px;
+      background: #0b0f33;
+      padding: 12px;
+      box-shadow: 0 18px 44px rgba(7,11,42,0.34);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .preview-screen {
+      min-height: 365px;
+      border-radius: 22px;
+      padding: 18px;
+      background:
+        radial-gradient(circle at top, rgba(255,75,210,0.12), transparent 20%),
+        linear-gradient(180deg, #11174f 0%, #0b1038 100%);
+    }
+
+    .phone-chip {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #d8ddff;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .mini-node {
+      margin-bottom: 10px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #eef1ff;
+      font-size: 13px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 18px;
+      color: #d8ddff;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .section {
+      padding: 94px 0;
+      position: relative;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 28px;
+    }
+
+    .section-kicker {
+      color: #cbd6ff;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.12;
+      margin-bottom: 14px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .card-grid-3,
+    .card-grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      transform: translateY(26px);
+      opacity: 0;
+      transition: transform 0.7s ease, opacity 0.7s ease;
+    }
+
+    .card.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,75,210,0.16));
+      border: 1px solid rgba(255,255,255,0.12);
+      margin-bottom: 18px;
+      font-size: 22px;
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .card li {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .card ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+    }
+
+    .comparison {
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 18px 20px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+    }
+
+    th {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      font-size: 15px;
+    }
+
+    td { color: var(--muted); }
+    td strong { color: #fff; }
+
+    .cta {
+      padding: 110px 0 90px;
+    }
+
+    .cta-box {
+      position: relative;
+      overflow: hidden;
+      padding: 42px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top right, rgba(255,75,210,0.14), transparent 20%),
+        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.07));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .cta-box::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      right: -34px;
+      bottom: -58px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,148,214,0.95), rgba(255,75,210,0.64), rgba(123,92,255,0.2));
+      opacity: 0.9;
+    }
+
+    .cta-box p {
+      max-width: 56ch;
+      font-size: 18px;
+      margin: 0 0 24px;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer {
+      padding: 28px 0 56px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(5,8,25,0.58);
+      backdrop-filter: blur(10px);
+      z-index: 300;
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-card {
+      width: min(520px, 100%);
+      background: linear-gradient(180deg, rgba(20,15,70,0.96), rgba(7,11,42,0.96));
+      border-radius: 30px;
+      padding: 30px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 60px rgba(7,11,42,0.48);
+    }
+
+    .modal-card h3 {
+      margin-bottom: 12px;
+      font-size: 28px;
+      color: #fff;
+    }
+
+    .modal-card p {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid,
+      .card-grid-3,
+      .card-grid-2,
+      .stats { grid-template-columns: 1fr; }
+
+      .app-preview { min-height: 780px; }
+      .mindmap-wrap {
+        right: 24px;
+        top: 24px;
+        bottom: auto;
+        min-height: 360px;
+      }
+
+      .preview-phone {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        width: auto;
+        top: 430px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .menu-btn { display: inline-flex; }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 78px;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px;
+        background: rgba(7,11,42,0.92);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .nav-links.open { display: flex; }
+      .hero { padding-top: 52px; }
+      h1 { max-width: 12ch; }
+      .cta-box { padding: 30px; }
+      .mindmap-wrap { padding: 14px; }
+      .map-node { font-size: 13px; padding: 12px 14px; }
+      .map-main { min-width: 190px; }
+      .c1, .c2, .c3, .c4 { width: 106px; }
+      th, td { padding: 14px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">본문으로 바로가기</a>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand" aria-label="Mind Orbit 홈으로 이동">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Mind Orbit</span>
+      </a>
+
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">메뉴</button>
+
+      <nav class="nav-links" id="navLinks" aria-label="주요 메뉴">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#positioning">Positioning</a>
+        <a href="#cta">CTA</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Orbit your thoughts · before they scatter</div>
+          <h1>
+            <span class="gradient-title">Every idea has an orbit.</span><br />
+            Start mapping yours.
+          </h1>
+          <p class="hero-copy">
+            <strong>Mind Orbit</strong>은 생각정리 중관여 사용자를 위한 모바일 중심 AI 마인드맵입니다.
+            메모앱보다 더 구조적이고, 무거운 생각정리 툴보다 더 가볍게,
+            떠오른 생각을 빠르게 기록하고 아름답게 구조화합니다.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="openModalBtn">베타 신청하기</button>
+            <a href="#solution" class="btn btn-secondary">기능 더 알아보기</a>
+          </div>
+
+          <div class="hero-tags" aria-label="핵심 가치 태그">
+            <span class="tag">빠른 기록</span>
+            <span class="tag">AI 구조화</span>
+            <span class="tag">모바일 중심</span>
+            <span class="tag">정돈된 결과물</span>
+            <span class="tag">가벼운 재진입</span>
+          </div>
+
+          <div class="stats" aria-label="핵심 지표">
+            <div class="stat">
+              <strong>5초 이해</strong>
+              <span>서비스 가치가 빠르게 이해되도록 설계된 메시지 구조</span>
+            </div>
+            <div class="stat">
+              <strong>100명</strong>
+              <span>48시간 내 확보한 글로벌 베타 테스터</span>
+            </div>
+            <div class="stat">
+              <strong>중관여 포지션</strong>
+              <span>메모앱과 고관여 툴 사이의 비어 있는 사용자층</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="Mind Orbit 제품 목업">
+          <div class="panel-top">
+            <div class="panel-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div class="panel-label">Mobile-first AI mindmap</div>
+          </div>
+
+          <div class="app-preview">
+            <span class="space-planet planet-a"></span>
+            <span class="space-planet planet-b"></span>
+            <span class="space-planet planet-c planet-ring"></span>
+
+            <div class="mindmap-wrap">
+              <div class="map-grid" role="img" aria-label="생각이 구조화되는 마인드맵 예시">
+                <div class="connector c1"></div>
+                <div class="connector c2"></div>
+                <div class="connector c3"></div>
+                <div class="connector c4"></div>
+                <div class="connector c5"></div>
+
+                <div class="map-node map-main"><strong>Mind Orbit</strong>흩어진 생각의 중심을 빠르게 잡기</div>
+                <div class="map-node map-a"><strong>Quick capture</strong>떠오른 생각을 즉시 기록</div>
+                <div class="map-node map-b"><strong>AI cluster</strong>비슷한 생각끼리 자동 정리</div>
+                <div class="map-node map-c"><strong>Structured result</strong>메모보다 보기 좋게 구조화</div>
+                <div class="map-node map-d"><strong>Mobile flow</strong>이동 중에도 자연스럽게 사용</div>
+                <div class="map-node map-e"><strong>Lightweight</strong>복잡한 기능 없이 바로 시작</div>
+              </div>
+            </div>
+
+            <div class="preview-phone" aria-hidden="true">
+              <div class="preview-screen">
+                <span class="phone-chip">Today’s Orbit</span>
+                <div class="mini-node"><strong>Quick capture</strong><br />회의 중 떠오른 아이디어 저장</div>
+                <div class="mini-node"><strong>Cluster</strong><br />AI가 비슷한 생각을 하나의 묶음으로 정리</div>
+                <div class="mini-node"><strong>Branch</strong><br />핵심 아이디어에서 자연스럽게 확장</div>
+                <div class="mini-node"><strong>Share</strong><br />깔끔한 결과물 그대로 다시 보기와 공유</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="problem">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Problem</div>
+          <h2>지금의 생각정리 도구는 너무 가볍거나, 너무 무겁습니다</h2>
+          <p>
+            빠르게 적는 메모앱은 구조가 약하고, 협업형 화이트보드는 개인에게 너무 무겁고,
+            전통 마인드맵은 모바일 경험과 심미성이 부족합니다. Mind Orbit은 그 사이의 비어 있는 지점을 겨냥합니다.
+          </p>
+        </div>
+
+        <div class="card-grid-3">
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">📝</div>
+            <h3>메모앱은 빠르지만 구조가 약합니다</h3>
+            <p>
+              Apple Notes, Google Keep은 빠르게 적기에는 좋지만,
+              생각 간 관계를 드러내거나 큰 흐름을 보는 데 한계가 있습니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🧩</div>
+            <h3>협업형 화이트보드는 개인에게 너무 무겁습니다</h3>
+            <p>
+              Miro, FigJam, Whimsical은 자유도는 높지만,
+              개인이 생각을 정리하기에는 기능이 많고 진입 피로도가 큽니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🌿</div>
+            <h3>전통 마인드맵은 감각과 모바일 경험이 약합니다</h3>
+            <p>
+              XMind, MindNode, SimpleMind는 구조화에는 적합하지만,
+              결과물의 미감과 모바일 재진입 경험이 아쉽습니다.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="solution">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Solution</div>
+          <h2>생각은 더 빠르게 붙잡고, 더 보기 좋게 정리합니다</h2>
+          <p>
+            Mind Orbit은 기능을 더하는 대신, 생각정리 중관여 사용자가 진짜 원하는 경험에 집중합니다.
+            빠른 기록, 가벼운 시작, 구조화, 모바일 사용성, 정돈된 결과물.
+          </p>
+        </div>
+
+        <div class="card-grid-3">
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">⚡</div>
+            <h3>빠르게 기록합니다</h3>
+            <p>
+              생각이 떠오르는 순간, 긴 설정 없이 바로 적고 시작할 수 있습니다.
+              메모앱처럼 가볍지만 그다음 흐름은 더 구조적입니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🧠</div>
+            <h3>AI가 구조를 도와줍니다</h3>
+            <p>
+              단순 생성이 아니라, 비슷한 생각을 묶고 가지를 나누는 방식으로
+              사고의 구조를 더 명확하게 보여줍니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">📱</div>
+            <h3>모바일에서도 자연스럽습니다</h3>
+            <p>
+              아이디어는 책상보다 이동 중에 더 자주 떠오릅니다.
+              Mind Orbit은 모바일에서도 흐름이 끊기지 않도록 설계됩니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🌙</div>
+            <h3>가볍게 다시 돌아올 수 있습니다</h3>
+            <p>
+              복잡한 설정과 과한 기능 대신,
+              언제 열어도 바로 이어서 정리할 수 있는 경험을 지향합니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">✨</div>
+            <h3>결과물이 보기 좋습니다</h3>
+            <p>
+              단순히 적는 데서 끝나는 것이 아니라,
+              저장하고 공유하고 다시 보고 싶어지는 정돈된 결과물을 만듭니다.
+            </p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🎯</div>
+            <h3>생각의 본질에 집중하게 합니다</h3>
+            <p>
+              기능이 적어서 오히려 더 빠르게 몰입할 수 있습니다.
+              복잡한 시스템보다 생각 자체에 집중하는 도구입니다.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="positioning">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Positioning</div>
+          <h2>메모앱과 고관여 툴 사이, 바로 그 사용자에게 맞춘 도구입니다</h2>
+          <p>
+            메모앱으로는 부족하지만 Obsidian 같은 고관여 도구는 부담스러운 사람들.
+            기획자, 마케터, 1인 창작자, 개인 브랜딩에 관심 있는 지식 노동자를 위한 포지션입니다.
+          </p>
+        </div>
+
+        <div class="card-grid-2" style="margin-bottom: 22px;">
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">👩‍💻</div>
+            <h3>이런 사람에게 적합합니다</h3>
+            <ul>
+              <li>생각은 많지만 도구 사용 피로도가 높은 사용자</li>
+              <li>메모앱보다 더 구조적인 정리가 필요한 사용자</li>
+              <li>모바일에서 아이디어가 자주 떠오르는 기획자, 마케터, 창작자</li>
+              <li>정돈감과 미감을 중요하게 여기는 지식 노동자</li>
+            </ul>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-icon" aria-hidden="true">🧭</div>
+            <h3>Mind Orbit의 위치</h3>
+            <p>
+              메모앱보다 더 구조적이고,
+              Obsidian보다 더 가벼운 생각정리 도구.
+              Mind Orbit은 생각정리 중관여 사용자에게 가장 설득력 있는 중간 지점을 목표로 합니다.
+            </p>
+          </article>
+        </div>
+
+        <div class="comparison reveal">
+          <table aria-label="경쟁 도구 비교표">
+            <thead>
+              <tr>
+                <th>도구 유형</th>
+                <th>장점</th>
+                <th>한계</th>
+                <th>Mind Orbit의 차이</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>메모앱</strong></td>
+                <td>빠른 기록</td>
+                <td>생각 간 관계가 잘 보이지 않음</td>
+                <td>빠르게 적되 더 구조적으로 정리</td>
+              </tr>
+              <tr>
+                <td><strong>협업형 화이트보드</strong></td>
+                <td>자유도와 협업성</td>
+                <td>개인 생각정리에는 과하게 무거움</td>
+                <td>개인 중심의 가볍고 집중된 흐름</td>
+              </tr>
+              <tr>
+                <td><strong>전통 마인드맵</strong></td>
+                <td>구조화에 적합</td>
+                <td>모바일 UX와 미감, 재진입성 부족</td>
+                <td>모바일 중심, 미감 있는 결과물, 가벼운 재진입</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="container">
+        <div class="cta-box reveal">
+          <div class="section-kicker">CTA</div>
+          <h2>생각이 흩어지기 전에, Mind Orbit을 먼저 경험해보세요</h2>
+          <p>
+            메모앱보다 더 구조적이고, 무거운 생각정리 툴보다 더 가벼운 경험이 궁금하다면,
+            지금 베타 소식을 가장 먼저 받아보세요.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="openModalBtnBottom">출시 알림 받기</button>
+            <a href="#top" class="btn btn-secondary">다시 살펴보기</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Mind Orbit</strong><br />
+        생각정리 중관여 사용자를 위한 모바일 중심 AI 마인드맵
+      </div>
+      <div>
+        Team Neurunners<br />
+        contact@mindorbit.app
+      </div>
+      <div>
+        © 2026 Mind Orbit. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="betaModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <h3 id="modalTitle">Mind Orbit을 가장 먼저 만나보세요</h3>
+      <p>
+        지금은 정적 랜딩페이지 데모 단계입니다. 실제 서비스에서는 이 버튼이 베타 신청 폼 또는 출시 알림 수집 화면으로 연결됩니다.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="closeModalBtn">닫기</button>
+        <a href="#top" class="btn btn-primary">상단으로 이동</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+    const modal = document.getElementById('betaModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const openModalBtnBottom = document.getElementById('openModalBtnBottom');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    menuBtn?.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    function openModal(trigger) {
+      modal.classList.add('open');
+      modal.dataset.triggerId = trigger?.id || 'openModalBtn';
+      closeModalBtn.focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      const triggerId = modal.dataset.triggerId;
+      document.getElementById(triggerId)?.focus();
+    }
+
+    openModalBtn?.addEventListener('click', () => openModal(openModalBtn));
+    openModalBtnBottom?.addEventListener('click', () => openModal(openModalBtnBottom));
+    closeModalBtn?.addEventListener('click', closeModal);
+
+    modal?.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('open')) {
+        closeModal();
+      }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
